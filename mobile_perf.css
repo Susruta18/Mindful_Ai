@@ -122,3 +122,59 @@ html, body {
   }
 }
 
+
+/* --- Fix Hero Section Top Spacing --- */
+@media (max-width: 768px) {
+  .hero-section {
+    padding-top: 120px !important; /* Push content down below the sticky navbar */
+    padding-bottom: 3rem !important;
+  }
+
+  /* --- Fix Hero Stats Squeezing --- */
+  .hero-stats {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 1.5rem !important;
+    margin-top: 2rem !important;
+  }
+  .hero-stat {
+    flex: 1 1 40% !important; /* Allow wrapping into 2 columns */
+    min-width: 120px !important;
+  }
+  .hero-stat-val {
+    font-size: 1.8rem !important; /* Consistent size */
+  }
+
+  /* Make sure the pill looks good */
+  .hero-pill {
+    margin-bottom: 1.5rem !important;
+  }
+}
+
+
+@media (max-width: 768px) {
+  /* Hide desktop navbar actions to prevent overflowing the header on mobile */
+  #signInNavLink, 
+  .panic-nav-btn,
+  #userProfileChip {
+    display: none !important;
+  }
+  
+  /* Ensure the navbar wrapper flexes properly without wrapping */
+  .navbar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 0.5rem 1rem !important;
+  }
+  
+  /* Prevent the right-side wrapper from breaking the layout */
+  .navbar > div:nth-of-type(2) {
+    gap: 0.5rem !important;
+    margin-left: auto;
+    margin-right: 1rem;
+  }
+}
+
