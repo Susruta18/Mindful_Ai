@@ -1,0 +1,52 @@
+/* Mobile Performance Optimizations */
+
+@media (max-width: 768px) {
+  /* 1. Disable heavy background animations and blurs to save GPU/CPU */
+  .orb, .lo-orb, .lo-orbs {
+    display: none !important;
+    animation: none !important;
+  }
+
+  .ambient-bg {
+    background: #060810 !important;
+    filter: none !important;
+  }
+
+  #particles, .particles {
+    display: none !important;
+  }
+
+  /* 2. Remove backdrop-filter (glass effect) as it's notoriously laggy on mobile browsers */
+  .login-glass-card, 
+  .ec-glass-card, 
+  .chat-container, 
+  .emotion-sidebar, 
+  .hero-chat-card, 
+  .md-card,
+  .music-player-widget,
+  .breathe-card,
+  .student-glass-card,
+  .navbar,
+  .mobile-menu {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(15, 20, 35, 0.98) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  }
+
+  /* 3. Hide custom cursor stuff */
+  #cursorGlow {
+    display: none !important;
+  }
+
+  /* 4. Optimize scrolling */
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Add hardware acceleration for scrolling areas */
+.chat-messages, .mood-dashboard, .journal-container {
+  transform: translateZ(0);
+  will-change: transform;
+}
