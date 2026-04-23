@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindfulAI – Real-Time Mental Health Chatbot</title>
+  <meta name="description"
+    content="MindfulAI is an AI-powered real-time mental health chatbot with emotion detection, music therapy, panic mode, burnout detection, and student-focused support." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#060810" />
+  <link rel="apple-touch-icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Sign-In Script -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <div id="g_id_onload"
+     data-client_id="264852796312-l2fkt5v43fvt31klvt6gmque9t87eov9.apps.googleusercontent.com"
+     data-context="signin"
+     data-ux_mode="popup"
+     data-callback="googleSignInCallback"
+     data-auto_prompt="false">
+  </div>
+  <!-- Scroll progress bar -->
+  <div id="scrollProgressBar"
+    style="position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#7eb8ff,#a78bfa,#34d399);z-index:9999;width:0%;transition:width 0.1s linear;pointer-events:none;">
+  </div>
+  <!-- Cursor glow -->
+  <div id="cursorGlow"
+    style="position:fixed;pointer-events:none;z-index:99998;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(126,184,255,0.07) 0%,transparent 70%);transform:translate(-50%,-50%);transition:transform 0.05s;top:-999px;left:-999px;">
+  </div>
+</head>
+
+<body>
+
+
+  <!-- Premium Toast Container -->
+  <div id="toastContainer" aria-live="polite"></div>
+
+  <!-- Game Tutorial Modal -->
+  <div id="gameTutorialModal" class="tutorial-overlay" style="display:none;"
+    onclick="if(event.target===this)closeTutorial()">
+    <div class="tutorial-card">
+      <button class="tutorial-close" onclick="closeTutorial()">✕</button>
+      <div id="tutorialContent"></div>
+    </div>
+  </div>
+
+  <!-- Ambient Background -->
+  <div class="ambient-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+    <div class="orb orb-5"></div>
+    <div class="particles" id="particles"></div>
+  </div>
+
+  <!-- ═══ LOGIN OVERLAY ═══ -->
+  <div class="login-overlay" id="appLoginOverlay">
+
+    <div class="lo-orbs" aria-hidden="true">
+      <div class="lo-orb lo-orb-1"></div>
+      <div class="lo-orb lo-orb-2"></div>
+      <div class="lo-orb lo-orb-3"></div>
+    </div>
+
+    <div class="login-split">
+
+      <!-- LEFT BRAND PANEL -->
+      <div class="login-brand-panel">
+        <div class="lbp-inner">
+          <div class="lbp-logo">
+            <div class="lbp-logo-glow">🧠</div>
+            <span>MindfulAI</span>
+          </div>
+          <h2 class="lbp-headline" style="font-size: 3.2rem; font-weight: 600; font-family: 'Playfair Display', Georgia, serif; margin-bottom: 0.8rem; letter-spacing: -0.5px; text-transform: none; color: #f8fafc;">Welcome Back</h2>
+          <p class="lbp-sub" style="font-size: 1.1rem; color: #cbd5e1; margin-bottom: 2.5rem; line-height: 1.5; font-weight: 300;">Sign in to continue your mental wellness journey</p>
+          
+          <div class="lbp-features" style="display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 2.5rem;">
+            <div class="lbp-feat" style="font-size: 1.05rem; font-weight: 600; color: #f8fafc; display: flex; align-items: center; gap: 1rem;">
+              <span style="font-size: 1.3rem;">💖</span> Real-Time Emotion AI
+            </div>
+            <div class="lbp-feat" style="font-size: 1.05rem; font-weight: 600; color: #f8fafc; display: flex; align-items: center; gap: 1rem;">
+              <span style="font-size: 1.3rem;">🌿</span> Guided Breathing & Grounding
+            </div>
+            <div class="lbp-feat" style="font-size: 1.05rem; font-weight: 600; color: #f8fafc; display: flex; align-items: center; gap: 1rem;">
+              <span style="font-size: 1.3rem;">🎵</span> Mood-Matched Music Therapy
+            </div>
+          </div>
+
+          <div class="lbp-stats" style="display: grid; grid-template-columns: auto auto; gap: 1.5rem 2.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;">
+            <div class="lbp-stat-check" style="display: flex; align-items: center; gap: 0.6rem; color: #e2e8f0; font-size: 0.95rem;">
+              <span style="color: #38bdf8; font-weight: bold; font-size: 1.1rem;">✔</span> <span style="font-weight: 600; color: #fff;">24/7</span> Availability
+            </div>
+            <div class="lbp-stat-check" style="display: flex; align-items: center; gap: 0.6rem; color: #e2e8f0; font-size: 0.95rem;">
+              <span style="color: #38bdf8; font-weight: bold; font-size: 1.1rem;">✔</span> <span style="font-weight: 600; color: #fff;">100%</span> Private & Secure
+            </div>
+            <div class="lbp-stat-check" style="display: flex; align-items: center; gap: 0.6rem; color: #e2e8f0; font-size: 0.95rem;">
+              <span style="color: #38bdf8; font-weight: bold; font-size: 1.1rem;">✔</span> Empathetic AI Support
+            </div>
+            <div class="lbp-stat-check" style="display: flex; align-items: center; gap: 0.6rem; color: #e2e8f0; font-size: 0.95rem;">
+              <span style="color: #38bdf8; font-weight: bold; font-size: 1.1rem;">✔</span> Science-backed therapies
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT FORM PANEL -->
+      <div class="login-form-panel">
+        <div class="login-glass-card">
+
+          <!-- Card Header -->
+          <div class="lgc-header" style="flex-direction: column; text-align: center; gap: 0.5rem; margin-bottom: 1rem;">
+            <div class="lgc-title-group" style="width: 100%;">
+              <h2 id="authTitle" style="font-size: 1.6rem; font-weight: 600; font-family: 'Playfair Display', Georgia, serif; color: #f8fafc; margin-bottom:0.4rem;">Sign In to MindfulAI</h2>
+              <p id="authSubtitle" style="color: #94a3b8; font-size: 0.95rem;">Your safe space for mental wellness</p>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <form class="login-form" id="authForm" onsubmit="handleAuth(event)">
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">✉</span>
+                <input type="email" id="email" class="form-control" placeholder="you@example.com" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">🔑</span>
+                <input type="password" id="password" class="form-control" placeholder="Enter your password" required />
+              </div>
+              <small style="color:var(--text-3);font-size:0.75rem;display:none;margin-top:0.3rem;line-height:1.4;"
+                id="pwdHelp">Password must be at least 8 characters, 1 uppercase, 1 number, and 1 special
+                character.</small>
+            </div>
+            <div class="form-options">
+              <label class="remember-me"><input type="checkbox" checked /> Remember me</label>
+              <a href="#" class="forgot-link">Forgot Password?</a>
+            </div>
+            <button type="submit" class="login-btn" id="authSubmitBtn">
+              <span id="authBtnText">Sign In</span>
+            </button>
+          </form>
+
+          <!-- Divider -->
+          <div class="login-divider"><span style="text-transform:uppercase;font-size:0.7rem;color:rgba(255,255,255,0.4);">OR</span></div>
+
+          <!-- Social buttons -->
+          <div class="social-btns">
+            <div style="flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; overflow: hidden; height: 44px;">
+              <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black" data-text="signin_with" data-size="large"></div>
+            </div>
+            <button class="social-btn apple-btn" type="button" onclick="handleAppleSignIn()"
+              aria-label="Sign in with Apple">
+              <svg width="17" height="17" viewBox="0 0 384 512" fill="currentColor">
+                <path
+                  d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
+              </svg>
+              <span>Apple</span>
+            </button>
+          </div>
+
+          <!-- Footer -->
+          <div class="login-footer">
+            <p id="authSwitchText">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up here</a></p>
+          </div>
+
+          <!-- Trust badges -->
+          <div class="login-trust" style="display:flex; justify-content:center; gap: 1.5rem; font-size: 0.75rem; color: #94a3b8; margin-top: 1rem; align-items:center;">
+            <span>🔒 End-to-End Encrypted</span>
+            <span>☁️ Cloud Sync</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ EMERGENCY CONTACT OVERLAY ═══ -->
+  <div class="login-overlay hidden" id="emergencyContactOverlay" style="align-items: center; justify-content: center;">
+    <div class="lo-orbs" aria-hidden="true">
+      <div class="lo-orb lo-orb-1"></div>
+      <div class="lo-orb lo-orb-2"></div>
+    </div>
+
+    <div class="ec-glass-card">
+      <div class="ec-top-accent">
+        <div class="ec-accent-icon">📞</div>
+      </div>
+
+      <div class="ec-header">
+        <h2>Emergency Contact</h2>
+        <p>Who should we reach if you need crisis support?</p>
+      </div>
+
+      <div class="ec-options" id="ecOptionsContainer">
+        <div class="ec-option" onclick="selectECOption(this)">
+          <div class="ec-option-icon">
+            <span class="ec-icon-emoji">⚕️</span>
+            <span class="ec-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+          </div>
+          <div class="ec-option-info"><strong>iCall Helpline</strong><span>9152987821</span></div>
+        </div>
+
+        <div class="ec-option" onclick="selectECOption(this)">
+          <div class="ec-option-icon">
+            <span class="ec-icon-emoji">🏥</span>
+            <span class="ec-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+          </div>
+          <div class="ec-option-info"><strong>NIMHANS</strong><span>080-46110007</span></div>
+        </div>
+
+        <div class="ec-option active" onclick="selectECOption(this)">
+          <div class="ec-option-icon">
+            <span class="ec-icon-emoji">🤱</span>
+            <span class="ec-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+          </div>
+          <div class="ec-option-info"><strong>Maa</strong><span>9820466627</span></div>
+        </div>
+
+        <div class="ec-option" onclick="selectECOption(this)">
+          <div class="ec-option-icon">
+            <span class="ec-icon-emoji">🧑‍⚕️</span>
+            <span class="ec-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+          </div>
+          <div class="ec-option-info"><strong>Therapist</strong><span>1860-2662-345</span></div>
+        </div>
+      </div>
+
+      <button onclick="saveEmergencyContacts()" class="ec-continue-btn">
+        <span>Select &amp; Continue</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </button>
+
+      <div class="ec-footer">
+        <a href="#" onclick="document.getElementById('emergencyContactOverlay').classList.add('hidden');">Skip for
+          now</a>
+      </div>
+    </div>
+  </div>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo">
+      <div class="logo-icon">🧠</div>
+      <span>MindfulAI</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" class="nav-link active" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Home</a></li>
+      <li><a href="#chat" class="nav-link">Chat</a></li>
+      <li><a href="#mood" class="nav-link">Mood</a></li>
+      <li><a href="#journal" class="nav-link">Journal</a></li>
+      <li><a href="#breathe" class="nav-link">Breathe</a></li>
+      <li><a href="#music" class="nav-link">Music</a></li>
+      <li><a href="#student" class="nav-link">Student</a></li>
+      <li><a href="#games" class="nav-link">🎮 Games</a></li>
+      <li><a href="#help" class="nav-link">Help</a></li>
+    </ul>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <button id="themeToggleBtn" onclick="toggleTheme()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-1); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; transition: 0.3s; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" aria-label="Toggle Theme">☀️</button>
+      <!-- Professional User Status Chip -->
+      <div id="userProfileChip" class="user-profile-chip" style="display:none;">
+        <div class="upc-avatar-wrap">
+          <div id="userAvatar" class="upc-avatar">RI</div>
+          <div class="upc-status-dot"></div>
+        </div>
+        <div class="upc-info">
+          <span id="userDisplayName" class="upc-name">risabghosh430</span>
+          <span class="upc-status-text">Online</span>
+        </div>
+        <div class="upc-divider"></div>
+        <button class="upc-logout" onclick="logoutUser()" title="Log out">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+            <line x1="12" y1="2" x2="12" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+      <a href="#" id="signInNavLink" onclick="document.getElementById('appLoginOverlay').classList.remove('hidden');"
+        class="nav-link" style="font-weight: 600;">Sign In</a>
+      <button class="nav-cta panic-nav-btn" id="panicNavBtn" onclick="triggerPanicMode()">🆘 Panic Mode</button>
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMobile()">☰</button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    
+    <!-- Mobile User Profile -->
+    <div id="mobileUserProfile" class="mobile-profile-chip" style="display:none;">
+      <div class="mpc-avatar-wrap">
+        <div id="mobileUserAvatar" class="upc-avatar">RI</div>
+        <div class="upc-status-dot"></div>
+      </div>
+      <div class="mpc-info">
+        <span id="mobileUserDisplayName" class="upc-name">risabghosh430</span>
+        <span class="upc-status-text">Online</span>
+      </div>
+      <button class="upc-logout" onclick="logoutUser()" title="Log out" style="margin-left: auto;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+          <line x1="12" y1="2" x2="12" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+
+    <a href="#chat" onclick="toggleMobile()">Chat</a>
+    <a href="#mood" onclick="toggleMobile()">Mood</a>
+    <a href="#journal" onclick="toggleMobile()">Journal</a>
+    <a href="#breathe" onclick="toggleMobile()">Breathe</a>
+    <a href="#music" onclick="toggleMobile()">Music</a>
+    <a href="#student" onclick="toggleMobile()">Student Mode</a>
+    <a href="#games" onclick="toggleMobile()">🎮 Mind Refresh Games</a>
+    <a href="#" id="mobileSignInLink" onclick="document.getElementById('appLoginOverlay').classList.remove('hidden'); toggleMobile();"
+      style="color: var(--primary); font-weight: 600;">Sign In</a>
+    <button class="mobile-panic-btn" onclick="triggerPanicMode(); toggleMobile()">🆘 I'm Panicking</button>
+  </div>
+
+  <!-- ═══ PANIC MODE OVERLAY ═══ -->
+  <div class="panic-overlay" id="panicOverlay">
+    <div class="panic-content">
+      <button class="panic-close-btn" onclick="closePanicMode()">✕ Close</button>
+      <div class="panic-header">
+        <div class="panic-pulse-ring"></div>
+        <div class="panic-icon">💙</div>
+        <h2>You Are Safe. I'm Right Here.</h2>
+        <p>Focus on this screen. Follow along. You're going to be okay.</p>
+      </div>
+
+      <div class="panic-breathe-zone">
+        <div class="panic-circle" id="panicCircle">
+          <span class="panic-breathe-text" id="panicBreathText">Breathe</span>
+          <span class="panic-breathe-count" id="panicBreathCount"></span>
+        </div>
+        <p class="panic-phase-text" id="panicPhaseText">Tap the circle to begin guided breathing</p>
+      </div>
+
+      <div class="panic-grounding">
+        <h3>🌍 5-4-3-2-1 Grounding</h3>
+        <div class="grounding-steps" id="groundingSteps">
+          <div class="grounding-step" onclick="activateGrounding(this, 0)">
+            <span class="g-num">5</span>
+            <span class="g-sense">👁️</span>
+            <span class="g-label">Things you can <strong>SEE</strong></span>
+          </div>
+          <div class="grounding-step" onclick="activateGrounding(this, 1)">
+            <span class="g-num">4</span>
+            <span class="g-sense">✋</span>
+            <span class="g-label">Things you can <strong>TOUCH</strong></span>
+          </div>
+          <div class="grounding-step" onclick="activateGrounding(this, 2)">
+            <span class="g-num">3</span>
+            <span class="g-sense">👂</span>
+            <span class="g-label">Things you can <strong>HEAR</strong></span>
+          </div>
+          <div class="grounding-step" onclick="activateGrounding(this, 3)">
+            <span class="g-num">2</span>
+            <span class="g-sense">👃</span>
+            <span class="g-label">Things you can <strong>SMELL</strong></span>
+          </div>
+          <div class="grounding-step" onclick="activateGrounding(this, 4)">
+            <span class="g-num">1</span>
+            <span class="g-sense">👅</span>
+            <span class="g-label">Thing you can <strong>TASTE</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panic-affirmations" id="panicAffirmations">
+        <p class="panic-affirmation-text" id="panicAffirmText">This feeling is temporary. It will pass.</p>
+      </div>
+
+      <div class="panic-actions">
+        <button class="panic-action-btn" onclick="scrollToSection('breathe'); closePanicMode()">🌬️ Full Breathing
+          Exercise</button>
+        <div id="userSavedPanicContacts" style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%;">
+          <a href="tel:9152987821" class="panic-action-btn danger" id="defaultPanicCall">📞 Call iCall Now</a>
+        </div>
+        <button class="panic-action-btn" onclick="closePanicMode(); scrollToSection('chat')">💬 Talk to Mira</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ HERO SECTION ═══ -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-pill">✨ Real-Time AI Mental Health Support</div>
+      <h1 class="hero-title">
+        Your Always-Available
+        <span class="hero-title-accent">Mental Health Companion</span>
+      </h1>
+      <p class="hero-subtitle">
+        Real-time emotion detection, music therapy, guided breathing, and student burnout detection — all in one safe, empathetic space.
+      </p>
+      <div class="hero-actions">
+        <a href="#chat" class="hero-btn hero-btn-primary">
+          <span style="font-size:1.1rem;">💬</span>
+          <span>Talk to Mira</span>
+        </a>
+        <button class="hero-btn hero-btn-secondary" onclick="triggerPanicMode()">
+          <span style="font-size:1.1rem;">🆘</span>
+          <span>I'm Panicking</span>
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-val">24/7</span>
+          <span class="hero-stat-label">Available</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-val">Real-Time</span>
+          <span class="hero-stat-label">Emotion AI</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-val">100%</span>
+          <span class="hero-stat-label">Private</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-chat-card">
+        <div class="hcc-header">
+          <div class="hcc-avatar">🌿</div>
+          <div class="hcc-info">
+            <h4>Mira - Your AI Companion</h4>
+            <p>Listening. Understanding. Guiding.</p>
+          </div>
+        </div>
+        <div class="hcc-messages">
+          <div class="hcc-bubble hcc-bubble-ai">
+            Hello 💙 How are you feeling right now?
+          </div>
+          <div class="hcc-bubble hcc-bubble-user">
+            Exams start tomorrow and I can't sleep...
+          </div>
+        </div>
+        <div class="hcc-input">
+          <span>Type your message here...</span>
+          <div class="hcc-input-actions">
+            <span class="arrow-icon">➤</span>
+            <div class="send-icon">+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CHAT ═══ -->
+  <section class="chat-section" id="chat">
+    <div class="chat-layout">
+
+      <!-- Main Chat -->
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="chat-avatar">🌿</div>
+          <div class="chat-info">
+            <h3>Mira</h3>
+            <span class="online-dot"></span> <span id="miraStatus">Online – Ready to listen</span>
+          </div>
+          <div class="chat-header-right">
+            <!-- Live Mood Display -->
+            <div class="live-mood-display" id="liveMoodDisplay">
+              <span class="lmd-emoji" id="lmdEmoji">😐</span>
+              <span class="lmd-label" id="lmdLabel">Neutral</span>
+            </div>
+            <div class="chat-actions">
+              <select id="chatLanguage" class="chat-lang-select" onchange="changeLanguage()" title="Chatbot Language"
+                style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; padding: 0.3rem 0.5rem; outline: none; font-size: 0.85rem; cursor: pointer; margin-right: 0.5rem;">
+                <option value="auto" style="color: #0f172a;">🌐 Auto-Detect</option>
+                <option value="english" style="color: #0f172a;">🇬🇧 English</option>
+                <option value="hindi" style="color: #0f172a;">🇮🇳 Hindi</option>
+                <option value="bengali" style="color: #0f172a;">🇧🇩 Bengali</option>
+                <option value="telugu" style="color: #0f172a;">🇮🇳 Telugu</option>
+                <option value="marathi" style="color: #0f172a;">🇮🇳 Marathi</option>
+                <option value="tamil" style="color: #0f172a;">🇮🇳 Tamil</option>
+                <option value="spanish" style="color: #0f172a;">🇪🇸 Spanish</option>
+                <option value="french" style="color: #0f172a;">🇫🇷 French</option>
+              </select>
+              <button class="chat-btn" title="Session insights" onclick="toggleEmotionPanel()"
+                id="emotionPanelBtn">🧠</button>
+              <button class="chat-btn" title="Music therapy" onclick="scrollToSection('music')">🎵</button>
+              <button class="chat-btn" id="clearBtn" onclick="clearChat()" title="Clear chat">🗑️</button>
+              <button class="chat-btn panic-chat-btn" onclick="triggerPanicMode()" title="Panic mode">🆘</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stress Typing Indicator -->
+        <div class="stress-indicator" id="stressIndicator">
+          <div class="stress-wave" id="stressWave"></div>
+          <span class="stress-label" id="stressLabel">⚡ Stress detected in typing pattern — take a breath</span>
+        </div>
+
+        <!-- Voice Tone Indicator -->
+        <div class="voice-tone-indicator" id="voiceToneIndicator" style="display:none;">
+          <div class="vti-visualizer" id="vtiVisualizer">
+            <div class="vti-bar"></div>
+            <div class="vti-bar"></div>
+            <div class="vti-bar"></div>
+            <div class="vti-bar"></div>
+            <div class="vti-bar"></div>
+          </div>
+          <span class="vti-label" id="vtiLabel">Listening to voice...</span>
+        </div>
+
+        <!-- Live Emotion Bar -->
+        <div class="emotion-indicator" id="emotionIndicator">
+          <span class="ei-label" id="eiLabel">Detecting emotion...</span>
+          <div class="ei-bars" id="eiBars"></div>
+          <div class="ei-typing-speed" id="eiTypingSpeed"></div>
+        </div>
+
+        <!-- Mood Quick Bar -->
+        <div class="mood-quick-bar">
+          <span class="mood-bar-label">How are you feeling?</span>
+          <button class="mood-quick-btn" onclick="quickMood('😊', 'Happy')" title="Happy">😊</button>
+          <button class="mood-quick-btn" onclick="quickMood('😔', 'Sad')" title="Sad">😔</button>
+          <button class="mood-quick-btn" onclick="quickMood('😰', 'Anxious')" title="Anxious">😰</button>
+          <button class="mood-quick-btn" onclick="quickMood('😤', 'Stressed')" title="Stressed">😤</button>
+          <button class="mood-quick-btn" onclick="quickMood('😴', 'Exhausted')" title="Exhausted">😴</button>
+          <button class="mood-quick-btn" onclick="quickMood('😡', 'Angry')" title="Angry">😡</button>
+          <button class="mood-quick-btn" onclick="quickMood('😵', 'Overwhelmed')" title="Overwhelmed">😵</button>
+          <button class="mood-quick-btn" onclick="quickMood('🤗', 'Grateful')" title="Grateful">🤗</button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+          <div class="message ai-message">
+            <div class="msg-avatar">🌿</div>
+            <div class="msg-content">
+              <div class="msg-bubble">
+                Hi there! 👋 I'm <strong>Mira</strong>, your real-time mental health companion.<br><br>
+                I'm constantly listening, detecting your emotions, and adapting my responses to give you exactly what
+                you need — whether that's empathy, guidance, music, or breathing exercises.<br><br>
+                I also have a special <strong>🆘 Panic Mode</strong> button at the top if you ever need instant
+                calm.<br><br>
+                <strong>How are you feeling right now?</strong> 💙
+              </div>
+              <div class="msg-time">Just now</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time Music Suggestion Strip -->
+        <div class="music-strip" id="musicStrip" style="display:none;">
+          <span class="ms-label">🎵 Mira suggests:</span>
+          <span class="ms-content" id="msContent"></span>
+          <button class="ms-explore" onclick="scrollToSection('music')">Explore →</button>
+        </div>
+
+        <!-- Motivational Quote Strip -->
+        <div class="motivation-strip" id="motivationStrip" style="display:none;">
+          <span class="mot-icon">✨</span>
+          <span class="mot-text" id="motText"></span>
+        </div>
+
+        <div class="chat-suggestions" id="chatSuggestions">
+          <button class="suggestion-chip" onclick="sendMessage('I\'ve been feeling really stressed lately')">I feel
+            stressed</button>
+          <button class="suggestion-chip" onclick="sendMessage('I\'m struggling with anxiety')">Dealing with
+            anxiety</button>
+          <button class="suggestion-chip" onclick="sendMessage('Exam pressure is killing me')">Exam stress</button>
+          <button class="suggestion-chip" onclick="sendMessage('I feel completely burned out')">I\'m burned out</button>
+        </div>
+
+        <div class="chat-input-area">
+          <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Talk to Mira">🎙️</button>
+          <div class="input-wrapper">
+            <textarea id="chatInput" class="chat-input" placeholder="Share what's on your mind... I'm here to listen 💙"
+              rows="1" onkeydown="handleKeyDown(event)" oninput="handleInput(this)"></textarea>
+            <span class="char-counter" id="charCounter">0</span>
+          </div>
+          <button class="send-btn" onclick="sendMessage()" title="Send message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+          <button class="voice-toggle-btn" id="voiceToggleBtn" onclick="toggleVoice()" title="Toggle AI Voice">
+            <span id="voiceIcon">🔊</span>
+          </button>
+        </div>
+
+        <div class="emoji-picker" id="emojiPicker">
+          <span onclick="insertEmoji('😊')">😊</span><span onclick="insertEmoji('😔')">😔</span>
+          <span onclick="insertEmoji('😰')">😰</span><span onclick="insertEmoji('😤')">😤</span>
+          <span onclick="insertEmoji('💙')">💙</span><span onclick="insertEmoji('🌿')">🌿</span>
+          <span onclick="insertEmoji('✨')">✨</span><span onclick="insertEmoji('🙏')">🙏</span>
+          <span onclick="insertEmoji('😴')">😴</span><span onclick="insertEmoji('🤗')">🤗</span>
+          <span onclick="insertEmoji('😭')">😭</span><span onclick="insertEmoji('😵')">😵</span>
+          <span onclick="insertEmoji('📚')">📚</span><span onclick="insertEmoji('🔥')">🔥</span>
+        </div>
+      </div>
+
+      <!-- Emotion Sidebar -->
+      <div class="emotion-sidebar" id="emotionSidebar">
+        <div class="esb-header">
+          <span>🧠 Session Insights</span>
+          <button onclick="toggleEmotionPanel()">✕</button>
+        </div>
+        <div class="esb-body">
+          <div class="esb-dominant" id="esbDominant">
+            <span class="esb-emoji" id="esbEmoji">—</span>
+            <div>
+              <strong id="esbLabel">No data yet</strong>
+              <small>Dominant emotion</small>
+            </div>
+          </div>
+
+          <!-- Mood Intensity Meter -->
+          <div class="esb-intensity-section">
+            <span class="esb-section-title">Intensity</span>
+            <div class="intensity-bar-wrap">
+              <div class="intensity-bar">
+                <div class="intensity-fill" id="intensityFill" style="width:0%;"></div>
+              </div>
+              <span class="intensity-label" id="intensityLabel">--</span>
+            </div>
+          </div>
+
+          <div class="esb-sentiment" id="esbSentiment">
+            <div class="sent-bar-wrap">
+              <span>Negative</span>
+              <div class="sent-bar">
+                <div class="sent-fill" id="sentFill"></div>
+              </div>
+              <span>Positive</span>
+            </div>
+            <small id="sentLabel">Sentiment: Neutral</small>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="esb-quick-actions">
+            <button class="esb-qa-btn" onclick="triggerPanicMode()">🆘 Panic Mode</button>
+            <button class="esb-qa-btn" onclick="scrollToSection('breathe'); toggleEmotionPanel()">🌬️ Breathe</button>
+            <button class="esb-qa-btn" onclick="scrollToSection('music'); toggleEmotionPanel()">🎵 Music</button>
+          </div>
+
+          <div class="esb-history" id="esbHistory">
+            <p class="esb-empty">Start chatting to see your emotion timeline.</p>
+          </div>
+          <button class="esb-log-btn" onclick="autoLogMoodFromSession()" id="esbLogBtn">📊 Log to Mood Tracker</button>
+        </div>
+      </div>
+
+    </div><!-- .chat-layout -->
+
+    <!-- Crisis Modal -->
+    <div class="crisis-modal" id="crisisModal">
+      <div class="crisis-modal-content">
+        <div class="cm-icon">🆘</div>
+        <h3>You're Not Alone</h3>
+        <p>It sounds like you might be going through something very serious. Please reach out immediately:</p>
+        <div class="cm-contacts">
+          <a href="tel:9152987821" class="cm-contact">📞 iCall: 9152987821</a>
+          <a href="tel:9820466627" class="cm-contact">📞 AASRA: 9820466627</a>
+          <a href="tel:18602662345" class="cm-contact">📞 Vandrevala: 1860-2662-345</a>
+        </div>
+        <button onclick="closeCrisisModal()" class="cm-close">I'm safe – continue talking to Mira</button>
+      </div>
+    </div>
+
+    <div class="crisis-banner">
+      <span>⚠️</span>
+      <p>In crisis? Call <strong>iCall: 9152987821</strong> or <strong>NIMHANS: 080-46110007</strong> immediately.</p>
+    </div>
+  </section>
+
+  <!-- ═══ MOOD TRACKER ═══ -->
+  <section class="mood-section" id="mood">
+    <h2 class="section-title">Mood Tracker</h2>
+    <p class="section-subtitle">Log your emotions daily and discover your patterns</p>
+
+    <div class="mood-tracker-container">
+      <div class="mood-left-panel" style="display: flex; flex-direction: column; gap: 2rem;">
+        <div class="mood-logger">
+          <h3>Log Today's Mood</h3>
+          <div class="mood-emojis">
+            <button class="mood-emoji-btn" onclick="selectMood(this, 5, 'Excellent', '😄')">😄</button>
+            <button class="mood-emoji-btn" onclick="selectMood(this, 4, 'Good', '😊')">😊</button>
+            <button class="mood-emoji-btn" onclick="selectMood(this, 3, 'Okay', '😐')">😐</button>
+            <button class="mood-emoji-btn" onclick="selectMood(this, 2, 'Low', '😔')">😔</button>
+            <button class="mood-emoji-btn" onclick="selectMood(this, 1, 'Bad', '😢')">😢</button>
+          </div>
+          <div class="mood-selected-label" id="selectedMoodLabel">Select a mood above</div>
+
+          <!-- Removed mood-note text area -->
+
+          <div class="mood-tags">
+            <span class="mood-tag-label">What's affecting you?</span>
+            <div class="tags-grid" id="tagsGrid">
+              <button class="mood-tag" onclick="toggleTag(this)">😴 Sleep</button>
+              <button class="mood-tag" onclick="toggleTag(this)">📚 Studies</button>
+              <button class="mood-tag" onclick="toggleTag(this)">👥 Social</button>
+              <button class="mood-tag" onclick="toggleTag(this)">💼 Work</button>
+              <button class="mood-tag" onclick="toggleTag(this)">❤️ Relationship</button>
+              <button class="mood-tag" onclick="toggleTag(this)">🏃 Exercise</button>
+              <button class="mood-tag" onclick="toggleTag(this)">🍎 Diet</button>
+              <button class="mood-tag" onclick="toggleTag(this)">🤒 Health</button>
+              <button class="mood-tag" onclick="toggleTag(this)">📝 Exams</button>
+              <button class="mood-tag" onclick="toggleTag(this)">🔥 Burnout</button>
+            </div>
+          </div>
+
+          <button class="log-mood-btn" id="logMoodBtn" onclick="logMood()">Log My Mood</button>
+        </div>
+
+        <div class="mood-left-bottom-stack">
+          <!-- Highlights Title -->
+          <h4 style="margin: 0 0 0.8rem; font-size: 1.15rem; color: #fff; font-weight:600;">Highlights</h4>
+
+          <div class="md-grid-dual highlights-grid">
+            <div class="md-card highlight-card">
+              <div class="hl-header"><span class="md-icon">☀️</span> <strong style="color:#fff">Best Day</strong> <span
+                  class="hl-date" id="bestDayDate">(--)</span>: Score <span class="hl-score pos"
+                  id="bestDayScore">--</span></div>
+              <p id="bestDayText" style="font-size:0.8rem; color:#d1d5db; margin:0.4rem 0;">No data.</p>
+              <div class="hl-meta" id="bestDayMeta" style="font-size:0.75rem; color:#9ca3af;">Key Logged: Score:
+                --<br>Tags: --</div>
+            </div>
+            <div class="md-card highlight-card">
+              <div class="hl-header"><span class="md-icon">🌧️</span> <strong style="color:#fff">Worst Day</strong> <span
+                  class="hl-date" id="worstDayDate">(--)</span>: Score <span class="hl-score neg"
+                  id="worstDayScore">--</span></div>
+              <p id="worstDayText" style="font-size:0.8rem; color:#d1d5db; margin:0.4rem 0;">No data.</p>
+              <div class="hl-meta" id="worstDayMeta" style="font-size:0.75rem; color:#9ca3af;">Key Logged: Score:
+                --<br>Tags: --</div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <div class="mood-dashboard">
+        <!-- Header -->
+        <div class="md-header">
+          <h3 style="margin: 0; font-family: var(--font-display); font-size: 1.4rem;">Your Mood History</h3>
+          <div class="md-header-actions">
+            <div class="md-user-avatar">
+              <img src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff&rounded=true&size=30"
+                alt="User" style="border-radius: 50%;">
+            </div>
+            <button class="md-btn-export" onclick="exportDataCSV()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Top Grid: Heatmap + Weekly Chart -->
+        <div class="md-grid-top">
+          <div class="md-card">
+            <div class="md-card-header">
+              <span class="md-icon">📅</span>
+              <h4>Daily Mood Heatmap</h4>
+            </div>
+            <div class="heatmap-widget">
+              <div class="hm-header">
+                <button onclick="heatmapChangeMonth(-1)">&#60;</button>
+                <span id="heatmapMonthLbl">April 2026</span>
+                <button onclick="heatmapChangeMonth(1)">&#62;</button>
+              </div>
+              <div class="hm-weekdays">
+                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+              </div>
+              <div class="hm-grid" id="moodHeatmapCalendar">
+                <!-- Javascript will inject calendar here -->
+              </div>
+              <div class="hm-legend">
+                <span>
+                  <div class="hm-box hm-excellent"></div> Great
+                </span>
+                <span>
+                  <div class="hm-box hm-good"></div> Good
+                </span>
+                <span>
+                  <div class="hm-box hm-okay"></div> Okay
+                </span>
+                <span>
+                  <div class="hm-box hm-low"></div> Low
+                </span>
+                <span>
+                  <div class="hm-box hm-bad"></div> Very Low
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weekly Mood Chart Removed -->
+        </div>
+
+        <!-- Triple Grid: Gauges & Stats -->
+        <div class="md-grid-triple">
+          <div class="md-card" style="display:flex; flex-direction:column;">
+            <div class="md-card-header">
+              <h4>Average Mood</h4>
+            </div>
+            <div class="gauge-widget" style="margin-top:auto; text-align:center; position:relative;">
+              <svg viewBox="0 0 100 50" class="gauge-arc" style="width:100%; max-width:140px; overflow:visible;">
+                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#374151" stroke-width="8"
+                  stroke-linecap="round" />
+                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="url(#gaugeGradient)" stroke-width="8"
+                  stroke-linecap="round" stroke-dasharray="125.6" stroke-dashoffset="60" id="avgMoodArc" />
+                <defs>
+                  <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#ef4444" />
+                    <stop offset="50%" stop-color="#eab308" />
+                    <stop offset="100%" stop-color="#22c55e" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="gauge-value" style="position:absolute; bottom: 0; left:50%; transform:translate(-50%);">
+                <span class="g-num" id="avgMood" style="font-size:1.8rem; font-weight:800; color:#fff;">2.4</span>
+                <span class="g-max" style="font-size:0.7rem; color:#9ca3af; display:block; margin-top:-2px;">/ 5.0</span>
+              </div>
+            </div>
+            <div class="gauge-trend" style="font-size:0.75rem; color:#d1d5db; margin-top: 15px; text-align:center;">Trending: <strong id="trendLabel">Stable</strong></div>
+          </div>
+
+          <!-- Streak and Total Logs Removed -->
+        </div>
+
+        <!-- Dual Grid: Insights -->
+        <div class="md-grid-dual">
+          <!-- Mood Trends Removed -->
+
+          <div class="md-card">
+            <div class="md-card-header">
+              <span class="md-icon">🏷️</span>
+              <h4>Top Influencers</h4>
+            </div>
+            <div class="influencers-list" id="topTriggersList">
+              <span style="color:#6b7280; font-size:0.85rem">No triggers logged yet.</span>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ GUIDED JOURNAL ═══ -->
+  <section class="journal-section" id="journal">
+    <h2 class="section-title">📓 Guided Journal</h2>
+    <p class="section-subtitle">Reflect on your thoughts and feelings</p>
+    <div class="journal-container">
+      <div class="journal-compose">
+        <h3>New Entry</h3>
+        <div class="journal-moods" id="journalMoods">
+          <button class="mood-emoji-btn" onclick="selectJournalMood(this, '😄')">😄</button>
+          <button class="mood-emoji-btn" onclick="selectJournalMood(this, '😊')">😊</button>
+          <button class="mood-emoji-btn" onclick="selectJournalMood(this, '😐')">😐</button>
+          <button class="mood-emoji-btn" onclick="selectJournalMood(this, '😔')">😔</button>
+          <button class="mood-emoji-btn" onclick="selectJournalMood(this, '😢')">😢</button>
+        </div>
+        <div class="journal-prompts">
+          <button class="suggestion-chip" onclick="setJournalPrompt('What went well today?')">What went well
+            today?</button>
+          <button class="suggestion-chip" onclick="setJournalPrompt('I felt anxious when...')">I felt anxious
+            when...</button>
+          <button class="suggestion-chip" onclick="setJournalPrompt('A challenging moment was...')">A challenging moment
+            was...</button>
+          <button class="suggestion-chip" onclick="setJournalPrompt('I am grateful for...')">I am grateful
+            for...</button>
+        </div>
+        <textarea id="journalInput" class="form-control" rows="6" placeholder="Write your thoughts here..."
+          style="width: 100%; resize: vertical; margin-bottom: 1rem;"></textarea>
+        <div class="journal-actions" style="display: flex; gap: 1rem;">
+          <button class="btn-primary" onclick="saveJournalEntry()" style="flex: 1; justify-content: center;">Save
+            Entry</button>
+          <button class="btn-panic-hero" onclick="clearJournalForm()">Clear</button>
+        </div>
+      </div>
+
+      <div class="journal-history">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h3>Past Entries</h3>
+          <input type="text" id="journalSearch" class="form-control" style="max-width: 200px; padding: 0.6rem 1rem;"
+            placeholder="Search entries..." onkeyup="filterJournalEntries(this.value)">
+        </div>
+        <div id="journalEntriesList" class="journal-entries-list">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ BREATHING ═══ -->
+  <section class="breathe-section" id="breathe">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 class="section-title" style="margin-bottom: 1.5rem; font-size: 2.2rem;">
+        Breathing Exercises
+      </h2>
+      <p class="section-subtitle">Calm your nervous system with scientifically-backed guided breathing</p>
+    </div>
+
+    <div class="breathe-container-cosmic">
+
+      <!-- LEFT: Cosmic Crystal Visualization -->
+      <div class="breathe-crystal-panel">
+        <div class="crystal-wrapper">
+          <svg class="cosmic-crystal" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="crystalGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" style="stop-color:rgba(126,184,255,0.8);stop-opacity:1" />
+                <stop offset="100%" style="stop-color:rgba(126,184,255,0.2);stop-opacity:0" />
+              </radialGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- Outer geometric frame -->
+            <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(126,184,255,0.3)" stroke-width="1.5" />
+            <circle cx="200" cy="200" r="160" fill="none" stroke="rgba(126,184,255,0.2)" stroke-width="1" />
+            <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(192,132,252,0.2)" stroke-width="1" />
+
+            <!-- Hexagonal inner structure -->
+            <g id="hexagon" opacity="0.4">
+              <polygon points="200,80 320,140 320,260 200,320 80,260 80,140" fill="none" stroke="rgba(126,184,255,0.25)"
+                stroke-width="1.5" />
+              <polygon points="200,100 305,155 305,265 200,305 95,265 95,155" fill="none" stroke="rgba(192,132,252,0.2)"
+                stroke-width="1" />
+            </g>
+
+            <!-- Breathing cycle rings (will be styled dynamically) -->
+            <g id="breathe-rings" filter="url(#glow)">
+              <!-- Inhale arc -->
+              <circle id="ring-inhale" cx="200" cy="200" r="120" fill="none" stroke="rgba(126,184,255,0.5)"
+                stroke-width="3" opacity="0.6" />
+              <!-- Hold arc -->
+              <circle id="ring-hold" cx="200" cy="200" r="100" fill="none" stroke="rgba(192,132,252,0.4)"
+                stroke-width="2.5" opacity="0.5" />
+              <!-- Exhale arc -->
+              <circle id="ring-exhale" cx="200" cy="200" r="80" fill="none" stroke="rgba(167,139,250,0.3)"
+                stroke-width="2" opacity="0.4" />
+            </g>
+
+            <!-- Central glowing area -->
+            <circle cx="200" cy="200" r="60" fill="url(#crystalGrad)" opacity="0.4" />
+
+            <!-- Decorative stars/dots -->
+            <g id="decorative-stars" opacity="0.6">
+              <circle cx="200" cy="120" r="2.5" fill="rgba(251,191,36,0.8)" />
+              <circle cx="280" cy="160" r="2" fill="rgba(34,211,238,0.7)" />
+              <circle cx="300" cy="240" r="2" fill="rgba(126,184,255,0.6)" />
+              <circle cx="200" cy="300" r="2.5" fill="rgba(167,139,250,0.7)" />
+              <circle cx="100" cy="240" r="2" fill="rgba(34,211,238,0.6)" />
+              <circle cx="80" cy="160" r="2" fill="rgba(251,191,36,0.7)" />
+            </g>
+          </svg>
+
+          <!-- Central text overlay -->
+          <div class="crystal-center-text">
+            <div class="cct-main" id="crystalCenterText">PREPARE</div>
+            <div class="cct-sub" id="crystalSubText">Press to Begin</div>
+          </div>
+
+          <!-- Breathing phase indicator -->
+          <div class="breathe-phase-label" id="breathePhase" style="margin-bottom: 2rem;">Choose a technique to begin</div>
+        </div>
+        
+        <!-- Start Button Shifted Under Sphere -->
+        <button class="start-session-btn" id="breatheStartBtn" onclick="toggleBreathing()">
+          <span class="ssb-icon">▶</span>
+          <span class="ssb-text" style="font-weight: 600;">Start Session</span>
+        </button>
+      </div>
+
+      <!-- RIGHT: Technique Controls -->
+      <div class="breathe-controls-panel-cosmic">
+
+        <!-- Technique Selection -->
+        <div class="technique-selector">
+          <div class="technique-cards-grid" style="display: flex; flex-direction: column; gap: 0.8rem;">
+            <!-- Box Breathing -->
+            <button class="technique-card active" onclick="selectTechnique('box', this)" data-technique="box">
+              <div class="tc-icon">🟦</div>
+              <div class="tc-label">Box Breathing</div>
+              <div class="tc-timing">4s · 4s · 4s · 4s</div>
+              <div class="tc-badge" style="display:none;">SELECTED</div>
+            </button>
+
+            <!-- 4-7-8 Technique -->
+            <button class="technique-card" onclick="selectTechnique('478', this)" data-technique="478">
+              <div class="tc-icon">🌙</div>
+              <div class="tc-label">4-7-8 Technique</div>
+              <div class="tc-timing">4s · 7s · 8s</div>
+              <div class="tc-badge">SELECTED</div>
+            </button>
+
+            <!-- Deep Breathing -->
+            <button class="technique-card" onclick="selectTechnique('diaphragm', this)" data-technique="diaphragm">
+              <div class="tc-icon">🌊</div>
+              <div class="tc-label">Deep Breathing</div>
+              <div class="tc-timing">5s in · 5s out</div>
+              <div class="tc-badge" style="display:none;">SELECTED</div>
+            </button>
+
+            <!-- Panic Calm -->
+            <button class="technique-card" onclick="selectTechnique('panic', this)" data-technique="panic">
+              <div class="tc-icon">🆘</div>
+              <div class="tc-label">Panic Calm</div>
+              <div class="tc-timing">3s in · 6s out</div>
+              <div class="tc-badge" style="display:none;">SELECTED</div>
+              <div class="tc-extra">Find your anchor</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Session Info Displays -->
+        <div class="session-info-row">
+          <div class="session-info-box">
+            <div class="sib-label">CYCLES</div>
+            <div class="sib-value" id="cycleCount">0</div>
+          </div>
+          <div class="session-info-box">
+            <div class="sib-label">DURATION</div>
+            <div class="sib-value" id="sessionDuration">5:00</div>
+          </div>
+        </div>
+
+        <!-- Technique Details Card -->
+        <div class="technique-details-card" id="techniqueDetailsCard">
+          <div class="tdc-label">TECHNIQUE DETAILS:</div>
+          <div class="tdc-title" id="detailsTitle">Box Breathing</div>
+          <div class="tdc-description" id="detailsDesc">
+            A calming technique used by Navy SEALs. Inhale for 4 seconds • Hold for 4 seconds • Exhale for 4 seconds •
+            Hold for 4 seconds. Perfect for managing stress and anxiety.
+          </div>
+        </div>
+
+      </div>
+    </div><!-- .breathe-container-cosmic -->
+  </section>
+
+  <!-- ═══ MUSIC THERAPY ═══ -->
+  <section class="music-section" id="music">
+    <h2 class="section-title">🎵 Real-Time Music Therapy</h2>
+    <p class="section-subtitle">Mood-matched playlists to regulate and lift your emotional state</p>
+
+    <div class="music-container">
+      <!-- Current Mood Detector -->
+      <div class="music-mood-detector">
+        <h3>Your Current Detected Mood</h3>
+        <div class="music-mood-display" id="musicMoodDisplay">
+          <div class="mmd-emoji" id="mmdEmoji">🎵</div>
+          <div class="mmd-info">
+            <strong id="mmdMoodName">Chat with Mira to detect mood</strong>
+            <span id="mmdDesc">I'll suggest music based on what you're feeling</span>
+          </div>
+        </div>
+        <div class="music-categories" id="musicCategories">
+          <button class="music-cat-btn active" onclick="filterMusic('all', this)">All</button>
+          <button class="music-cat-btn" onclick="filterMusic('calming', this)">😌 Calming</button>
+          <button class="music-cat-btn" onclick="filterMusic('uplifting', this)">🌟 Uplifting</button>
+          <button class="music-cat-btn" onclick="filterMusic('focus', this)">🎯 Focus</button>
+          <button class="music-cat-btn" onclick="filterMusic('sleep', this)">😴 Sleep</button>
+          <button class="music-cat-btn" onclick="filterMusic('energy', this)">⚡ Energy</button>
+        </div>
+      </div>
+
+      <!-- Playlists Grid -->
+      <div class="playlists-grid" id="playlistsGrid">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STUDENT MODE ═══ -->
+  <section class="student-section" id="student">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 class="section-title" style="display: flex; align-items: center; justify-content: center; gap: 0.8rem; position: relative; margin-bottom: 1rem; font-size: 2.2rem;">
+        <div style="display: flex; position: relative; width: 34px; height: 34px;">
+           <div style="position: absolute; left: 0; top: 0; width: 22px; height: 28px; background: #34d399; border-radius: 4px; opacity: 0.8;"></div>
+           <div style="position: absolute; left: 8px; top: 4px; width: 22px; height: 28px; background: #f43f5e; border-radius: 4px; opacity: 0.8;"></div>
+           <div style="position: absolute; left: 16px; top: 8px; width: 22px; height: 28px; background: #3b82f6; border-radius: 4px; opacity: 0.8;"></div>
+        </div>
+        <span style="position: relative; display: inline-block;">
+          Student Wellness Hub
+          <div style="position:absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 80px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, transparent, #818cf8, transparent); box-shadow: 0 0 10px #818cf8;"></div>
+        </span>
+      </h2>
+      <p class="section-subtitle" style="margin-top: 1.5rem;">Built specifically for students dealing with academic pressure, exams, and burnout</p>
+    </div>
+
+    <div class="student-container" style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 1.5rem; align-items: start;">
+
+      <!-- Burnout Test -->
+      <div class="burnout-card">
+        <div class="burnout-header">
+          <span class="burnout-icon">🔥</span>
+          <div>
+            <h3>Burnout Self-Assessment</h3>
+            <p>Answer honestly — this stays private</p>
+          </div>
+        </div>
+        <div class="burnout-questions" id="burnoutQuestions">
+          <!-- Injected by JS -->
+        </div>
+        <button class="burnout-check-btn" onclick="checkBurnout()">Check My Burnout Level</button>
+        <div class="burnout-result" id="burnoutResult" style="display:none;"></div>
+      </div>
+
+      <!-- Pomodoro Mode -->
+      <div class="pomodoro-card" id="pomodoroCard">
+        <div class="pomo-header" style="display: flex; align-items: center; justify-content: flex-start; gap: 1rem; margin-bottom: 2.5rem; width: 100%;">
+          <span class="pomo-icon"
+            style="background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: var(--r-md); font-size: 1.2rem;">⏱️</span>
+          <h3 style="font-size: 1.5rem; margin: 0; font-family: var(--font-body); font-weight: 700;">Pomodoro Mode</h3>
+        </div>
+
+        <div class="pomo-body"
+          style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; width: 100%;">
+          <div class="pomo-circle-wrap"
+            style="position: relative; width: 220px; height: 220px; border-radius: 50%; border: 14px solid #38bdf8; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(56,189,248,0.4), inset 0 0 20px rgba(56,189,248,0.2);">
+            <div class="pomodoro-display" id="pomodoroDisplay"
+              style="font-size: 4.5rem; font-weight: 800; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.3); margin: 0; letter-spacing: -1px;">
+              25:00</div>
+          </div>
+
+          <div class="pomo-ctrls" style="display: flex; flex-direction: column; align-items: center; gap: 1rem; width: 100%;">
+            <p class="pomodoro-phase" id="pomodoroPhase"
+              style="font-size: 1rem; color: #fff; text-transform: none; letter-spacing: normal; margin: 0 0 0.5rem 0; font-weight: 500;">
+              Study Session</p>
+            <button onclick="togglePomodoro()" id="pomodoroBtn"
+              style="padding: 0.9rem 2rem; background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff; border: none; border-radius: var(--r-md); font-weight: 600; font-size: 1.05rem; cursor: pointer; box-shadow: 0 4px 20px rgba(168,85,247,0.4); transition: 0.2s; width: 200px;">Start
+              Focus</button>
+            <button onclick="resetPomodoro()"
+              style="padding: 0.8rem 2rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; border-radius: var(--r-md); font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; width: 200px;">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exam Stress Mode -->
+      <div class="exam-stress-card">
+        <div class="exam-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 1.2rem;">
+            <span style="font-size: 2.5rem; text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);">📝</span>
+            <div>
+              <h3 style="font-size: 1.4rem; color: var(--text-1); margin-bottom: 0.2rem;">Exam Stress Mode</h3>
+              <p style="font-size: 0.95rem; color: var(--text-2); margin: 0;">Targeted strategies for academic pressure</p>
+            </div>
+          </div>
+          <button class="exam-activate-btn" id="examModeBtn" onclick="toggleExamMode()" style="margin-top: 0; align-self: center;">Activate</button>
+        </div>
+        <div class="exam-tools" id="examTools" style="display:none; flex-direction: column; gap: 1rem;">
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="examQuickChips">
+            <div class="exam-tool" style="font-size: 0.85rem; padding: 0.5rem 1rem;"
+              onclick="fillExamStress('I have an exam tomorrow and I\'m terrified. My mind keeps going blank.')">😱
+              Pre-Exam Panic</div>
+            <div class="exam-tool" style="font-size: 0.85rem; padding: 0.5rem 1rem;"
+              onclick="fillExamStress('I just failed my exam and I feel like a complete failure. What do I do?')">💔
+              Post-Exam Crash</div>
+            <div class="exam-tool" style="font-size: 0.85rem; padding: 0.5rem 1rem;"
+              onclick="fillExamStress('I can\'t focus at all. I keep getting distracted and wasting time.')">🎯 Zero
+              Focus</div>
+          </div>
+
+          <div class="exam-input-wrap" style="position: relative; width: 100%;">
+            <textarea id="examStressInput" placeholder="What's making you stressed right now? Type it out..." rows="3"
+              class="form-control"
+              style="width: 100%; border-radius: var(--r-md); resize: vertical; border: 1px solid var(--border); transition: border-color 0.3s;"></textarea>
+            <div id="examStressIndicator"
+              style="position: absolute; right: 10px; bottom: 10px; font-size: 0.8rem; border-radius: 5px; padding: 2px 8px; font-weight: bold; background: transparent; color: transparent; transition: all 0.3s;">
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="analyzeExamStress()"
+            style="width: 100%; padding: 0.8rem; font-weight: 600; border-radius: var(--r-md); box-shadow: var(--shadow-btn);">Ask
+            Mira for Real-Time Help</button>
+
+          <div id="examStressResponse"
+            style="padding: 1.2rem; background: rgba(52,211,153,0.05); border-left: 3px solid var(--accent); border-radius: 0 var(--r-md) var(--r-md) 0; display: none; line-height: 1.5; font-size: 0.95rem; color: var(--text-1); white-space: pre-line;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Wellness Bites -->
+      <div class="student-tips-card" id="wellnessBitesCard">
+        <div class="pomo-header" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+          <span class="pomo-icon"
+            style="background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: var(--r-md); font-size: 1.2rem;">💡</span>
+          <h3 style="font-size: 1.5rem; margin: 0; font-family: var(--font-body); font-weight: 700;">Wellness Bites</h3>
+        </div>
+
+        <div class="wb-list" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="wb-item"
+            style="background: rgba(10,12,18,0.6); border: 1px solid rgba(52,211,153,0.15); padding: 1.5rem; border-radius: var(--r-md); transition: 0.3s; box-shadow: inset 0 0 20px rgba(52,211,153,0.02);">
+            <h4 style="color: #34d399; margin-bottom: 0.6rem; font-size: 1.1rem; font-weight: 600;">The 5-Min Rule</h4>
+            <p style="color: #9ca3af; font-size: 0.95rem; margin: 0; line-height: 1.5;">Just start for 5 mins. Hardest part is starting.</p>
+          </div>
+          <div class="wb-item"
+            style="background: rgba(10,12,18,0.6); border: 1px solid rgba(52,211,153,0.15); padding: 1.5rem; border-radius: var(--r-md); transition: 0.3s; box-shadow: inset 0 0 20px rgba(52,211,153,0.02);">
+            <h4 style="color: #34d399; margin-bottom: 0.6rem; font-size: 1.1rem; font-weight: 600;">25/5 Method</h4>
+            <p style="color: #9ca3af; font-size: 0.95rem; margin: 0; line-height: 1.5;">25m work + 5m rest. Prevents brain fatigue.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ MIND REFRESH GAMES ═══ -->
+  <section class="games-section" id="games">
+    <div class="games-header">
+      <h2 class="section-title">🎮 Mind Refresh Zone</h2>
+      <p class="section-subtitle">Calm your mind, boost your focus, and recharge with therapeutic mini-games</p>
+    </div>
+
+    <!-- Game Tabs -->
+    <div class="games-tabs">
+      <button class="game-tab-btn active" onclick="switchGame('bubbles', this)" id="tab-bubbles">
+        <span>🌊</span><span>Zen Bubbles</span>
+      </button>
+      <button class="game-tab-btn" onclick="switchGame('memory', this)" id="tab-memory">
+        <span>🧩</span><span>Memory Match</span>
+      </button>
+      <button class="game-tab-btn" onclick="switchGame('doodle', this)" id="tab-doodle">
+        <span>✨</span><span>Star Doodle</span>
+      </button>
+      <button class="game-tab-btn" onclick="switchGame('focus', this)" id="tab-focus">
+        <span>🎯</span><span>Focus Dots</span>
+      </button>
+      <button class="game-tab-btn" onclick="switchGame('colorbreath', this)" id="tab-colorbreath">
+        <span>🌈</span><span>Color Breath</span>
+      </button>
+
+      <button class="game-how-btn"
+        onclick="showTutorial(document.querySelector('.game-tab-btn.active').id.replace('tab-',''))"
+        title="How to Play">❓ How to Play</button>
+    </div>
+
+    <div class="games-arena">
+
+      <!-- GAME 1: ZEN BUBBLES -->
+      <div class="game-panel active" id="game-bubbles">
+        <div class="game-info-bar">
+          <div class="game-stat"><span class="gs-icon">💧</span><span class="gs-label">Popped</span><span class="gs-val"
+              id="bubbleScore">0</span></div>
+          <div class="game-stat"><span class="gs-icon">🏆</span><span class="gs-label">Best</span><span class="gs-val"
+              id="bubbleBest">0</span></div>
+          <div class="game-stat"><span class="gs-icon">⏱️</span><span class="gs-label">Time</span><span class="gs-val"
+              id="bubbleTime">60s</span></div>
+          <button class="game-control-btn" id="bubbleToggleBtn" onclick="toggleBubbles()">▶ Start</button>
+          <button class="game-control-btn secondary" onclick="resetBubbles()">↺ Reset</button>
+        </div>
+        <div class="bubble-arena" id="bubbleArena">
+          <div class="bubble-hint">Press Start to begin — pop the bubbles gently 🌊</div>
+        </div>
+        <div class="game-mood-tip">💡 <em>Each pop releases a tiny burst of calm. Breathe in rhythm with the
+            bubbles.</em></div>
+      </div>
+
+      <!-- GAME 2: MEMORY MATCH -->
+      <div class="game-panel" id="game-memory">
+        <div class="game-info-bar">
+          <div class="game-stat"><span class="gs-icon">🔀</span><span class="gs-label">Moves</span><span class="gs-val"
+              id="memoryMoves">0</span></div>
+          <div class="game-stat"><span class="gs-icon">✅</span><span class="gs-label">Matched</span><span class="gs-val"
+              id="memoryMatched">0</span></div>
+          <div class="game-stat"><span class="gs-icon">⏱️</span><span class="gs-label">Time</span><span class="gs-val"
+              id="memoryTime">0s</span></div>
+          <button class="game-control-btn" onclick="startMemoryGame()">▶ New Game</button>
+        </div>
+        <div class="memory-grid" id="memoryGrid"></div>
+        <div class="game-mood-tip">💡 <em>Memory games strengthen neural pathways and reduce cognitive anxiety.</em>
+        </div>
+      </div>
+
+      <!-- GAME 3: STAR DOODLE -->
+      <div class="game-panel" id="game-doodle">
+        <div class="game-info-bar">
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+            <span style="font-size:0.85rem;color:var(--text-2);">Color:</span>
+            <button class="doodle-color-btn active" style="background:#7eb8ff;"
+              onclick="setDoodleColor('#7eb8ff', this)"></button>
+            <button class="doodle-color-btn" style="background:#a78bfa;"
+              onclick="setDoodleColor('#a78bfa', this)"></button>
+            <button class="doodle-color-btn" style="background:#34d399;"
+              onclick="setDoodleColor('#34d399', this)"></button>
+            <button class="doodle-color-btn" style="background:#f472b6;"
+              onclick="setDoodleColor('#f472b6', this)"></button>
+            <button class="doodle-color-btn" style="background:#fbbf24;"
+              onclick="setDoodleColor('#fbbf24', this)"></button>
+          </div>
+          <div style="display:flex;gap:0.5rem;">
+            <label style="font-size:0.82rem;color:var(--text-2);display:flex;align-items:center;gap:0.3rem;">Size:
+              <input type="range" id="brushSize" min="2" max="20" value="6" style="width:70px;"></label>
+            <button class="game-control-btn secondary" onclick="clearDoodle()">🗑️ Clear</button>
+            <button class="game-control-btn" onclick="saveDoodle()">💾 Save</button>
+          </div>
+        </div>
+        <canvas id="doodleCanvas" class="doodle-canvas"></canvas>
+        <div class="game-mood-tip">💡 <em>Free drawing activates the right brain and releases emotional tension. No
+            rules here.</em></div>
+      </div>
+
+      <!-- GAME 4: FOCUS DOTS -->
+      <div class="game-panel" id="game-focus">
+        <div class="game-info-bar">
+          <div class="game-stat"><span class="gs-icon">🎯</span><span class="gs-label">Score</span><span class="gs-val"
+              id="focusScore">0</span></div>
+          <div class="game-stat"><span class="gs-icon">⏱️</span><span class="gs-label">Time</span><span class="gs-val"
+              id="focusTime">30s</span></div>
+          <div class="game-stat"><span class="gs-icon">💥</span><span class="gs-label">Missed</span><span class="gs-val"
+              id="focusMissed">0</span></div>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <label style="font-size:0.82rem;color:var(--text-2);">Speed:</label>
+            <select id="focusSpeed"
+              style="background:rgba(255,255,255,0.08);border:1px solid var(--border);color:#fff;padding:0.3rem 0.6rem;border-radius:8px;font-size:0.82rem;">
+              <option value="slow">🐢 Slow</option>
+              <option value="medium" selected>🐇 Medium</option>
+              <option value="fast">⚡ Fast</option>
+            </select>
+          </div>
+          <button class="game-control-btn" id="focusToggleBtn" onclick="toggleFocusGame()">▶ Start</button>
+        </div>
+        <div class="focus-arena" id="focusArena">
+          <div class="focus-hint">
+            <div style="font-size:3rem;margin-bottom:1rem;">🎯</div>
+            <p>Click the glowing dots before they disappear!</p>
+            <p style="color:var(--text-3);font-size:0.85rem;">Trains attention span & reduces mind wandering</p>
+          </div>
+        </div>
+        <div class="game-mood-tip">💡 <em>Focus training for 5 minutes can improve concentration for up to 2 hours.</em>
+        </div>
+      </div>
+
+      <!-- GAME 5: COLOR BREATHING -->
+      <div class="game-panel" id="game-colorbreath">
+        <div class="game-info-bar">
+          <div class="game-stat"><span class="gs-icon">🌈</span><span class="gs-label">Synced Breaths</span><span
+              class="gs-val" id="breathSyncCount">0</span></div>
+          <div class="game-stat"><span class="gs-icon">⏱️</span><span class="gs-label">Session</span><span
+              class="gs-val" id="breathSessionTime">0:00</span></div>
+          <button class="game-control-btn" id="colorBreathBtn" onclick="toggleColorBreath()">▶ Begin</button>
+        </div>
+        <div class="color-breath-arena" id="colorBreathArena">
+          <div class="cb-orb" id="cbOrb"></div>
+          <div class="cb-instruction" id="cbInstruction">Press Begin to start color breathing</div>
+          <div class="cb-sub" id="cbSub">Breathe in sync with the color and size shifts</div>
+        </div>
+        <div class="cb-palette" id="cbPalette">
+          <div class="cb-swatch" style="background:#1e3a5f;"></div>
+          <div class="cb-swatch" style="background:#2d4a8a;"></div>
+          <div class="cb-swatch" style="background:#4a3580;"></div>
+          <div class="cb-swatch" style="background:#1a5f4a;"></div>
+          <div class="cb-swatch" style="background:#5f3a1a;"></div>
+        </div>
+        <div class="game-mood-tip">💡 <em>Color therapy combined with breathing can reduce anxiety symptoms by up to
+            60%.</em></div>
+      </div>
+
+
+
+    </div><!-- .games-arena -->
+
+
+  </section>
+
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer" id="help">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <div class="logo-icon">🧠</div>
+        <span>MindfulAI</span>
+      </div>
+      <p class="footer-tagline">Your mental health matters. You are not alone. 💙</p>
+      <div class="footer-disclaimer">
+        <p>⚠️ <strong>Disclaimer:</strong> MindfulAI is an AI companion and is not a substitute for professional mental
+          health care. If you are in crisis, please seek immediate professional help.</p>
+      </div>
+      <div class="emergency-contacts" id="footerEmergencyContacts">
+        <h4>Emergency Contacts (India)</h4>
+        <div class="contacts-grid" id="footerContactsGrid">
+          <div class="contact">📞 iCall: <a href="tel:9152987821"><strong>9152987821</strong></a></div>
+          <div class="contact">📞 NIMHANS: <a href="tel:6523229800"><strong>6523229800</strong></a></div>
+          <div class="contact">📞 AASRA: <a href="tel:9820466627"><strong>9820466627</strong></a></div>
+          <div class="contact">📞 Vandrevala Foundation: <a href="tel:18602662345"><strong>1860-2662-345</strong></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 MindfulAI – Built with 💙 for student mental wellness</p>
+    </div>
+  </footer>
+
+  <!-- Back to top button -->
+  <button id="backToTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top"
+    aria-label="Back to top">
+    ↑
+  </button>
+
+  <!-- Section progress dots -->
+  <div class="section-progress-dots" id="sectionDots">
+    <div class="spd" data-target="home" title="Home"></div>
+    <div class="spd" data-target="chat" title="Chat"></div>
+    <div class="spd" data-target="mood" title="Mood"></div>
+    <div class="spd" data-target="journal" title="Journal"></div>
+    <div class="spd" data-target="breathe" title="Breathe"></div>
+    <div class="spd" data-target="music" title="Music"></div>
+    <div class="spd" data-target="student" title="Student"></div>
+    <div class="spd" data-target="games" title="Games"></div>
+    <div class="spd" data-target="resources" title="Help"></div>
+  </div>
+
+  <!-- Achievement Unlock Toast -->
+  <div id="achievementToast"
+    style="display:none;position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,rgba(20,25,50,0.97),rgba(15,20,40,0.97));border:1px solid rgba(251,191,36,0.5);border-radius:16px;padding:1rem 1.5rem;z-index:10002;box-shadow:0 8px 32px rgba(0,0,0,0.6),0 0 30px rgba(251,191,36,0.15);max-width:340px;text-align:center;backdrop-filter:blur(20px);">
+    <div id="achToastIcon" style="font-size:2.5rem;margin-bottom:0.4rem;"></div>
+    <div id="achToastTitle" style="color:#fbbf24;font-weight:700;font-size:1rem;"></div>
+    <div id="achToastMsg" style="color:var(--text-2);font-size:0.82rem;margin-top:0.2rem;"></div>
+  </div>
+
+  <!-- Strict Focus Mode Overlay -->
+  <div id="strictFocusOverlay"></div>
+  <div class="focus-mode-indicator">
+    <span class="timer-running-anim">🎯</span>
+    STRICT FOCUS ACTIVE — Website interaction restricted until timer ends
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

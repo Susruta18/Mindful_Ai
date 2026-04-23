@@ -1,0 +1,6 @@
+.vercel
+node_modules/
+.env
+*.log
+npm-debug.log*
+package-lock.json
