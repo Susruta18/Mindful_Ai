@@ -77,9 +77,11 @@ const User = mongoose.model('User', UserSchema);
 
 // 1. Database Connection Middleware
 app.use('/api', (req, res, next) => {
-  if (mongoose.connection.readyState !== 1) {
-    return res.status(503).json({ error: "Database not connected. Please check your server logs." });
+  // 0 = disconnected, 3 = disconnecting
+  if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
+    connectWithRetry();
   }
+  // Mongoose will automatically buffer queries if readyState === 2 (connecting)
   next();
 });
 
