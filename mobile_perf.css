@@ -50,3 +50,75 @@
   transform: translateZ(0);
   will-change: transform;
 }
+
+/* -- Deep Mobile Responsiveness Updates -- */
+
+html, body {
+  overflow-x: hidden; /* Absolutely prevent horizontal scroll globally */
+  -webkit-tap-highlight-color: transparent; /* Remove blue flash on tap */
+}
+
+@media (max-width: 768px) {
+  /* Ensure all interactive elements have comfortable touch targets */
+  button, 
+  .nav-link, 
+  .hero-btn, 
+  .mood-emoji-btn, 
+  .mood-tag, 
+  .suggestion-chip, 
+  select {
+    min-height: 44px; /* Standard minimum touch target */
+    touch-action: manipulation; /* Remove 300ms tap delay */
+  }
+
+  /* Fix squished hero actions */
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+  }
+  .hero-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Fix squished login/hero text */
+  .hero-title {
+    font-size: clamp(2rem, 8vw, 3rem) !important;
+  }
+  .lbp-headline {
+    font-size: clamp(2rem, 8vw, 3.2rem) !important;
+  }
+
+  /* Fix login stats grid from getting squished */
+  .lbp-stats {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  /* Fix chat header elements squeezing */
+  .chat-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 1rem;
+  }
+  .chat-header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Fix inputs to prevent zoom and increase tap area */
+  input[type="email"], 
+  input[type="password"], 
+  textarea {
+    font-size: 16px !important; /* iOS zooms if font-size < 16px */
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  /* Fix mood board left stack layout */
+  .mood-left-bottom-stack .highlights-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
